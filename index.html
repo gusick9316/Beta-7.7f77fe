@@ -639,7 +639,7 @@
             showLoading();
             
             // Append 'music' or '음악' to the query to filter for music content
-            const enhancedQuery = `${query} music 음악`;
+            const enhancedQuery = `${query} music 음악 official 공식 original 원곡`;
             
             try {
                 const apiKey = apiKeys[apiKeyIndex];
@@ -660,12 +660,28 @@
                     // Check for music-related keywords
                     const musicKeywords = ['music', 'song', 'audio', 'mv', 'm/v', 'official', 'lyric', 
                                           '음악', '노래', '뮤직', '가수', '앨범', '뮤비', '공식'];
-                    
-                    // Check if any of the keywords are in the title or description
-                    return musicKeywords.some(keyword => 
-                        title.includes(keyword) || description.includes(keyword)
-                    );
-                });
+                    // Keywords that indicate it's NOT an original song (remixes, covers, etc.)
+                    const excludeKeywords = [
+                    'remix', 'cover', 'covered', 'remake', 'instrumental', 'karaoke', 
+                    '리믹스', '커버', '리메이크', '리메익스', '노래방', '엠알', '인스트루먼탈',
+                    'slowed', 'sped up', 'nightcore', '나이트코어', 'reverb', '리버브',
+                    'lofi', '로파이', 'piano ver', 'acoustic', '어쿠스틱', 'mashup', '매쉬업'
+                    ];
+    
+                    // Check if any exclude keywords are in the title or description
+                    const isExcluded = excludeKeywords.some(keyword => 
+                    title.includes(keyword) || description.includes(keyword)
+                );
+    
+                // If it contains exclude keywords, filter it out
+                if (isExcluded) return false;
+    
+                 // Check if any of the music keywords are in the title or description
+                return musicKeywords.some(keyword => 
+                    title.includes(keyword) || description.includes(keyword)
+                );
+            });
+
                 
                 if (filteredItems.length === 0) {
                     throw new Error('No music videos found');
