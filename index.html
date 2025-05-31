@@ -3,864 +3,973 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>구겜스 뮤직</title>
+    <title>구식챗 - 실시간 채팅</title>
     <style>
-        :root {
-            --primary-color: #8a2be2;
-            --secondary-color: #ff3366;
-            --accent-color: #00ccff;
-            --text-color: #ffffff;
-            --bg-dark: #121212;
-            --bg-darker: #0a0a0a;
-            --card-bg: rgba(30, 30, 30, 0.8);
-            --card-hover: rgba(40, 40, 40, 0.9);
-            --shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-            --gradient: linear-gradient(135deg, #8a2be2, #ff3366, #00ccff);
-        }
-
+        /* 이전과 동일한 CSS 유지 */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Arial', sans-serif;
         }
-
+        
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-color);
-            overflow-x: hidden;
+            display: flex;
             height: 100vh;
-            position: relative;
+            background-color: #36393f;
+            color: white;
         }
-
-        #app {
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            position: relative;
+        
+        .sidebar {
+            width: 240px;
+            background-color: #202225;
+            padding: 15px;
+            overflow-y: auto;
         }
-
-        /* Animation Background */
-        .animation-bg {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            opacity: 0.3;
-            overflow: hidden;
+        
+        .server-list {
+            margin-bottom: 20px;
         }
-
-        .bubble {
-            position: absolute;
-            border-radius: 50%;
-            background: var(--gradient);
-            animation: float 20s linear infinite;
-            opacity: 0.4;
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(100vh) scale(0);
-                opacity: 0.4;
-            }
-            100% {
-                transform: translateY(-100vh) scale(1);
-                opacity: 0;
-            }
-        }
-
-        /* Audio Visualizer */
-        .visualizer {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 120px;
+        
+        .server-item {
+            padding: 10px;
+            margin-bottom: 5px;
+            background-color: #2f3136;
+            border-radius: 5px;
+            cursor: pointer;
             display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            z-index: 5;
-            padding: 0 20px;
-            pointer-events: none;
-            transform: translateY(100%);
-            transition: transform 0.5s ease-in-out;
-        }
-
-        .visualizer.active {
-            transform: translateY(0);
-        }
-
-        .visualizer-bar {
-            width: 5px;
-            height: 20px;
-            margin: 0 2px;
-            border-radius: 4px;
-            background: var(--gradient);
-            transition: height 0.2s ease;
-        }
-
-        /* Transitions */
-        .page {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transform: translateY(20px);
-            pointer-events: none;
-            transition: opacity 0.5s ease, transform 0.5s ease;
-        }
-
-        .page.active {
-            opacity: 1;
-            transform: translateY(0);
-            pointer-events: all;
-        }
-
-        /* Intro Page */
-        #intro-page {
-            background-color: var(--bg-darker);
-            z-index: 100;
-        }
-
-        .logo-text {
-            font-size: 2.5rem;
-            font-weight: 800;
-            margin-bottom: 30px;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                filter: brightness(1);
-            }
-            50% {
-                filter: brightness(1.3);
-            }
-        }
-
-        .loading {
-            display: flex;
-            margin: 20px 0;
-        }
-
-        .loading-dot {
-            width: 15px;
-            height: 15px;
-            margin: 0 5px;
-            border-radius: 50%;
-            background: var(--gradient);
-            animation: loadingDot 1.5s infinite ease-in-out;
-        }
-
-        .loading-dot:nth-child(1) { animation-delay: 0s; }
-        .loading-dot:nth-child(2) { animation-delay: 0.2s; }
-        .loading-dot:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes loadingDot {
-            0%, 100% {
-                transform: scale(0.3);
-                opacity: 0.3;
-            }
-            50% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .loading-text {
-            font-size: 1rem;
-            opacity: 0.8;
-            margin-top: 15px;
-        }
-
-        .copyright {
-            position: absolute;
-            bottom: 20px;
-            font-size: 0.9rem;
-            opacity: 0.6;
-        }
-
-        /* Main Page */
-        #main-page {
             justify-content: space-between;
-            padding: 40px 20px;
         }
-
-        .main-title {
-            font-size: 3rem;
-            font-weight: 900;
-            margin: 20px 0;
-            text-align: center;
-            background: var(--gradient);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
+        
+        .server-item:hover {
+            background-color: #3a3d44;
         }
-
+        
+        .server-controls {
+            display: flex;
+        }
+        
+        .server-controls button {
+            background: none;
+            border: none;
+            color: #b9bbbe;
+            cursor: pointer;
+            margin-left: 5px;
+            font-size: 12px;
+        }
+        
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            max-width: 400px;
         }
-
-        /* Search Page */
-        #search-page {
-            justify-content: flex-start;
-            padding-top: 60px;
-        }
-
-        .search-title {
-            font-size: 1.5rem;
-            margin-bottom: 30px;
-            text-align: center;
-        }
-
-        .search-form {
-            width: 100%;
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 15px 20px;
-            border-radius: 25px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            font-size: 1rem;
-            margin-bottom: 15px;
-            outline: none;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
-        }
-
-        .search-input:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(138, 43, 226, 0.3);
-        }
-
-        .search-examples {
-            width: 100%;
-            margin: 20px 0;
+        
+        .chat-header {
             padding: 15px;
-            border-radius: 15px;
-            background-color: var(--card-bg);
+            background-color: #2f3136;
+            border-bottom: 1px solid #292b2f;
         }
-
-        .example-item {
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.8);
+        
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background-color: #36393f;
         }
-
-        .example-item:last-child {
-            border-bottom: none;
+        
+        .message {
+            margin-bottom: 15px;
         }
-
-        .example-keyword {
-            color: var(--accent-color);
+        
+        .message-user {
             font-weight: bold;
+            color: #fff;
+            margin-right: 10px;
         }
-
-        /* Video Page */
-        #video-page {
-            justify-content: flex-start;
-            padding: 0;
-            background-color: var(--bg-darker);
+        
+        .message-time {
+            font-size: 12px;
+            color: #72767d;
+        }
+        
+        .message-content {
+            margin-top: 5px;
+        }
+        
+        .chat-input {
+            padding: 15px;
+            background-color: #40444b;
+        }
+        
+        .chat-input form {
+            display: flex;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            background-color: #484c52;
+            color: white;
+        }
+        
+        .chat-input button {
+            margin-left: 10px;
+            padding: 10px 15px;
+            background-color: #5865f2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .welcome-screen {
             display: flex;
             flex-direction: column;
-        }
-
-        .video-container {
-            width: 85%;
-            height: 70%;
-            position: relative;
-            background-color: #000;
-            margin: 60px auto 0;
-            border-radius: 16px;
-            overflow: hidden;
-            box-shadow: var(--shadow);
-        }
-
-        #youtube-player {
-            width: 100%;
-            height: 100%;
-            border-radius: 16px;
-        }
-
-        .video-title-notification {
-            position: absolute;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(0, 0, 0, 0.7);
-            padding: 12px 20px;
-            border-radius: 12px;
-            z-index: 10;
-            font-size: 0.95rem;
-            max-width: 90%;
-            text-align: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .video-title-notification.show {
-            opacity: 1;
-        }
-
-        .video-controls {
-            position: absolute;
-            bottom: 20px;
-            left: 0;
-            width: 100%;
-            display: flex;
             justify-content: center;
-            padding: 0 20px;
-            z-index: 10;
+            align-items: center;
+            height: 100%;
+            background-color: #36393f;
+            text-align: center;
         }
-
-        /* Buttons */
-        .btn {
-            padding: 12px 25px;
-            font-size: 1rem;
-            font-weight: 600;
-            color: white;
-            background: var(--gradient);
+        
+        .welcome-screen h1 {
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+        
+        .welcome-buttons {
+            display: flex;
+            gap: 20px;
+        }
+        
+        .welcome-buttons button {
+            padding: 15px 30px;
             border: none;
-            border-radius: 25px;
+            border-radius: 5px;
+            font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: var(--shadow);
-            position: relative;
-            overflow: hidden;
         }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        
+        .create-server {
+            background-color: #5865f2;
+            color: white;
         }
-
-        .btn:active {
-            transform: translateY(1px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        
+        .join-server {
+            background-color: #4f545c;
+            color: white;
         }
-
-        .btn::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background-color: rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.6s ease, height 0.6s ease;
-        }
-
-        .btn:active::after {
-            width: 300px;
-            height: 300px;
-            opacity: 0;
-        }
-
-        .btn-back {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            padding: 10px 15px;
-            font-size: 0.9rem;
-            z-index: 10;
-        }
-
-        .btn-next {
-            margin-left: 10px;
-        }
-
-        /* Loading Overlay */
-        .loading-overlay {
+        
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
-            right: 0;
-            bottom: 0;
+            width: 100%;
+            height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
-            display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-            backdrop-filter: blur(5px);
+            z-index: 100;
         }
-
-        .loading-overlay.active {
-            opacity: 1;
-            pointer-events: all;
+        
+        .modal-content {
+            background-color: #2f3136;
+            padding: 20px;
+            border-radius: 5px;
+            width: 400px;
         }
-
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            border: 3px solid transparent;
-            border-top-color: var(--primary-color);
-            border-bottom-color: var(--secondary-color);
-            animation: spin 1.5s linear infinite;
+        
+        .modal-header {
+            margin-bottom: 20px;
         }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-            100% {
-                transform: rotate(360deg);
-            }
+        
+        .modal-body {
+            margin-bottom: 20px;
         }
-
-        .loading-message {
-            margin-top: 20px;
-            font-size: 1.1rem;
+        
+        .modal-body input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #484c52;
+            border: none;
+            border-radius: 5px;
+            color: white;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .modal-footer button {
+            padding: 8px 15px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .modal-cancel {
+            background-color: #4f545c;
+            color: white;
+        }
+        
+        .modal-confirm {
+            background-color: #5865f2;
+            color: white;
+        }
+        
+        .footer {
+            padding: 10px;
             text-align: center;
+            background-color: #2f3136;
+            color: #b9bbbe;
+            font-size: 12px;
+        }
+        
+        .invite-code {
+            font-weight: bold;
+            color: #5865f2;
+            margin-top: 10px;
+        }
+        
+        .connection-status {
+            position: fixed;
+            bottom: 40px;
+            left: 10px;
+            padding: 5px 10px;
+            background-color: #f04747;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+        
+        .connected {
+            background-color: #43b581;
         }
     </style>
 </head>
 <body>
-    <div id="app">
-        <!-- Animation Background -->
-        <div class="animation-bg" id="animation-bg"></div>
-
-        <!-- Audio Visualizer -->
-        <div class="visualizer" id="visualizer"></div>
-
-        <!-- Intro Page -->
-        <div class="page active" id="intro-page">
-            <div class="logo-text">구겜스 뮤직</div>
-            <div class="loading">
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
-                <div class="loading-dot"></div>
-            </div>
-            <div class="loading-text" id="intro-loading-text">로딩중...</div>
-            <div class="copyright">ⓒ2025 구겜스</div>
-        </div>
-
-        <!-- Main Page -->
-        <div class="page" id="main-page">
-            <div class="main-content">
-                <h1 class="main-title">구겜스 뮤직!</h1>
-                <button class="btn" id="search-btn">노래 찾기</button>
-            </div>
-            <div class="copyright">ⓒ2025 구겜스 - YouTube API</div>
-        </div>
-
-        <!-- Search Page -->
-        <div class="page" id="search-page">
-            <button class="btn btn-back" id="search-back-btn">돌아가기</button>
-            <div class="search-form">
-                <h2 class="search-title">원하는 알고리즘을 입력하세요<br>(노래 검색이 아닌 노래추천)</h2>
-                <input type="text" class="search-input" id="search-input" placeholder="검색어 입력...">
-                <button class="btn" id="find-btn">찾기</button>
-                
-                <div class="search-examples">
-                    <div class="example-item">
-                        <span class="example-keyword">한국</span> → 한국 음악 영상
-                    </div>
-                    <div class="example-item">
-                        <span class="example-keyword">인기 한국</span> → 인기 한국 음악 영상
-                    </div>
-                    <div class="example-item">
-                        <span class="example-keyword">최신 글로벌</span> → 최신 글로벌 음악 영상
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Video Page -->
-        <div class="page" id="video-page">
-            <button class="btn btn-back" id="video-back-btn">돌아가기</button>
-            <button class="btn btn-back" id="next-video-btn" style="left: auto; right: 20px;">다음</button>
-            <div class="video-container">
-                <div id="youtube-player"></div>
-                <div class="video-title-notification" id="video-title-notification"></div>
-            </div>
-        </div>
-
-        <!-- Loading Overlay -->
-        <div class="loading-overlay" id="loading-overlay">
-            <div class="loading-spinner"></div>
-            <div class="loading-message" id="loading-message">찾는 중입니다...</div>
+    <!-- Welcome Screen -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <h1>구식챗에 오신 것을 환영합니다</h1>
+        <div class="welcome-buttons">
+            <button class="create-server" onclick="showCreateServerModal()">서버 만들기</button>
+            <button class="join-server" onclick="showJoinServerModal()">서버 참여</button>
         </div>
     </div>
 
-    <!-- YouTube API -->
-    <script src="https://www.youtube.com/iframe_api"></script>
+    <!-- Main App (hidden initially) -->
+    <div id="mainApp" style="display: none; width: 100%;">
+        <div class="sidebar">
+            <h3>내 서버 목록</h3>
+            <div class="server-list" id="serverList">
+                <!-- Servers will be added here dynamically -->
+            </div>
+            <button onclick="showCreateServerModal()" style="width: 100%; padding: 10px; background-color: #5865f2; color: white; border: none; border-radius: 5px; cursor: pointer;">새 서버 만들기</button>
+        </div>
+        
+        <div class="main-content">
+            <div class="chat-header" id="chatHeader">
+                <!-- Server name will be displayed here -->
+            </div>
+            
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will be displayed here -->
+                <div class="message">
+                    <div class="message-info">
+                        <span class="message-user">시스템</span>
+                        <span class="message-time">지금</span>
+                    </div>
+                    <div class="message-content">채팅 서버에 오신 것을 환영합니다!</div>
+                </div>
+            </div>
+            
+            <div class="chat-input">
+                <form onsubmit="sendMessage(event)">
+                    <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." autocomplete="off">
+                    <button type="submit">보내기</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Server Modal -->
+    <div class="modal" id="createServerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>서버 만들기</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="serverName" placeholder="서버 이름">
+                <input type="text" id="userName" placeholder="당신의 이름">
+                <div id="inviteCodeDisplay" style="display: none;">
+                    <p>초대 코드:</p>
+                    <p class="invite-code" id="inviteCode"></p>
+                    <p>이 코드를 공유하여 다른 사람들을 초대하세요!</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-cancel" onclick="hideModal('createServerModal')">취소</button>
+                <button class="modal-confirm" onclick="createServer()">만들기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Join Server Modal -->
+    <div class="modal" id="joinServerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>서버 참여</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="joinCode" placeholder="초대 코드 (4자리)">
+                <input type="text" id="joinUserName" placeholder="당신의 이름">
+            </div>
+            <div class="modal-footer">
+                <button class="modal-cancel" onclick="hideModal('joinServerModal')">취소</button>
+                <button class="modal-confirm" onclick="joinServer()">참여</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Server Modal -->
+    <div class="modal" id="editServerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>서버 설정</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="editServerName" placeholder="서버 이름">
+            </div>
+            <div class="modal-footer">
+                <button class="modal-cancel" onclick="hideModal('editServerModal')">취소</button>
+                <button class="modal-confirm" onclick="updateServer()">저장</button>
+                <button class="modal-confirm" style="background-color: #f04747;" onclick="deleteServer()">서버 삭제</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Set Name Modal -->
+    <div class="modal" id="setNameModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>이름 설정</h2>
+            </div>
+            <div class="modal-body">
+                <input type="text" id="setUserName" placeholder="당신의 이름">
+            </div>
+            <div class="modal-footer">
+                <button class="modal-confirm" onclick="setUserName()">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        개발: 김구식
+    </div>
     
+    <div class="connection-status" id="connectionStatus">
+        연결 끊김
+    </div>
+
     <script>
-        // Initialize Animation Background
-        function initAnimationBg() {
-            const animationBg = document.getElementById('animation-bg');
-            const bubbleCount = 15;
-            
-            for (let i = 0; i < bubbleCount; i++) {
-                const bubble = document.createElement('div');
-                bubble.classList.add('bubble');
-                
-                // Random size between 50px and 200px
-                const size = Math.random() * 150 + 50;
-                bubble.style.width = `${size}px`;
-                bubble.style.height = `${size}px`;
-                
-                // Random horizontal position
-                const left = Math.random() * 100;
-                bubble.style.left = `${left}%`;
-                
-                // Random delay and duration
-                const delay = Math.random() * 10;
-                const duration = Math.random() * 10 + 15;
-                bubble.style.animationDelay = `${delay}s`;
-                bubble.style.animationDuration = `${duration}s`;
-                
-                animationBg.appendChild(bubble);
-            }
-        }
-
-        // Initialize Audio Visualizer
-        function initVisualizer() {
-            const visualizer = document.getElementById('visualizer');
-            const barCount = 50;
-            
-            for (let i = 0; i < barCount; i++) {
-                const bar = document.createElement('div');
-                bar.classList.add('visualizer-bar');
-                visualizer.appendChild(bar);
-            }
-        }
-
-        // Animate Visualizer
-        function animateVisualizer(isActive = false) {
-            const visualizer = document.getElementById('visualizer');
-            const bars = visualizer.querySelectorAll('.visualizer-bar');
-            
-            if (isActive) {
-                visualizer.classList.add('active');
-                
-                // Animate the bars
-                bars.forEach(bar => {
-                    const animateBar = () => {
-                        const height = Math.random() * 100 + 20;
-                        bar.style.height = `${height}px`;
-                        setTimeout(animateBar, Math.random() * 300 + 100);
-                    };
-                    animateBar();
-                });
-            } else {
-                visualizer.classList.remove('active');
-                bars.forEach(bar => {
-                    bar.style.height = '20px';
-                });
-            }
-        }
-
-        // Variables
-        let player;
-        let currentVideoIndex = 0;
-        let videoList = [];
-        let isPlaying = false;
-        let apiKeyIndex = 0;
-        const apiKeys = [
-            'AIzaSyBdwqj7BBVgHhtjxc9rmOD4P6FNB_PrmY',
-            'AIzaSyA8BYzXL-Q_I1FKnVJitOeQ2Wg_iEyU7dc',
-            'AIzaSyB_LgRU_VFnU3upHtkmvHxoHrqV3WvdtG8'
-        ];
-
-        // Show loading overlay
-        function showLoading(message = '찾는 중입니다...') {
-            const loadingOverlay = document.getElementById('loading-overlay');
-            const loadingMessage = document.getElementById('loading-message');
-            
-            loadingMessage.textContent = message;
-            loadingOverlay.classList.add('active');
-        }
-
-        // Hide loading overlay
-        function hideLoading() {
-            const loadingOverlay = document.getElementById('loading-overlay');
-            loadingOverlay.classList.remove('active');
-        }
-
-        // Show page
-        function showPage(pageId) {
-            const pages = document.querySelectorAll('.page');
-            
-            pages.forEach(page => {
-                page.classList.remove('active');
-            });
-            
-            document.getElementById(pageId).classList.add('active');
-        }
-
-        // Show notification with video title
-        function showVideoTitleNotification(title) {
-            const notification = document.getElementById('video-title-notification');
-            notification.textContent = title;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 10000); // Hide after 10 seconds
-        }
-
-        // Search for videos
-        async function searchVideos(query) {
-            showLoading();
-            
-            // Append 'music' or '음악' to the query to filter for music content
-            const enhancedQuery = `${query} music 음악`;
-            
-            try {
-                const apiKey = apiKeys[apiKeyIndex];
-                // Get videos
-                const searchResponse = await fetch(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(enhancedQuery)}&type=video&maxResults=50&videoCategoryId=10&key=${apiKey}`);
-                
-                if (!searchResponse.ok) {
-                    throw new Error('API search request failed');
-                }
-                
-                const searchData = await searchResponse.json();
-                
-                // Filter videos to ensure they're music related
-                const filteredItems = searchData.items.filter(item => {
-                    const title = item.snippet.title.toLowerCase();
-                    const description = item.snippet.description.toLowerCase();
-                    
-                    // Check for music-related keywords
-                    const musicKeywords = ['music', 'song', 'audio', 'mv', 'm/v', 'official', 'lyric', 
-                                          '음악', '노래', '뮤직', '가수', '앨범', '뮤비', '공식'];
-                    
-                    // Check if any of the keywords are in the title or description
-                    return musicKeywords.some(keyword => 
-                        title.includes(keyword) || description.includes(keyword)
-                    );
-                });
-                
-                if (filteredItems.length === 0) {
-                    throw new Error('No music videos found');
-                }
-                
-                // Get video durations using videos API
-                const videoIds = filteredItems.map(item => item.id.videoId).join(',');
-                const videosResponse = await fetch(`https://www.googleapis.com/youtube/v3/videos?part=contentDetails&id=${videoIds}&key=${apiKey}`);
-                
-                if (!videosResponse.ok) {
-                    throw new Error('API videos request failed');
-                }
-                
-                const videosData = await videosResponse.json();
-                
-                // Create a map of video durations
-                const durationMap = {};
-                videosData.items.forEach(item => {
-                    const duration = item.contentDetails.duration; // PT1M30S format
-                    durationMap[item.id] = duration;
-                });
-                
-                // Further filter based on duration (between 1 minute and 10 minutes)
-                videoList = filteredItems.filter(item => {
-                    const duration = durationMap[item.id.videoId];
-                    if (!duration) return false;
-                    
-                    // Parse PT1M30S format
-                    const minutes = duration.match(/(\d+)M/);
-                    const seconds = duration.match(/(\d+)S/);
-                    
-                    const totalMinutes = (minutes ? parseInt(minutes[1]) : 0) + 
-                                        (seconds ? parseInt(seconds[1]) / 60 : 0);
-                    
-                    // Keep videos between 1 and 10 minutes
-                    return totalMinutes >= 1 && totalMinutes <= 10;
-                });
-                
-                if (videoList.length === 0) {
-                    throw new Error('No suitable music videos found');
-                }
-                
-                showLoading('영상을 찾았습니다');
-                
-                setTimeout(() => {
-                    hideLoading();
-                    currentVideoIndex = 0;
-                    showPage('video-page');
-                    player.loadVideoById(videoList[currentVideoIndex].id.videoId);
-                }, 1500);
-                
-            } catch (error) {
-                console.error('Search error:', error);
-                
-                // Try next API key
-                apiKeyIndex++;
-                
-                if (apiKeyIndex < apiKeys.length) {
-                    searchVideos(query); // Retry with next key
-                } else {
-                    // All keys failed
-                    apiKeyIndex = 0;
-                    hideLoading();
-                    alert('지금은 사용할 수 없습니다. 나중에 다시 시도해 주세요.');
-                    showPage('search-page');
-                }
-            }
-        }
-
-        // Play next video
-        function playNextVideo() {
-            if (videoList.length === 0) return;
-            
-            currentVideoIndex = (currentVideoIndex + 1) % videoList.length;
-            player.loadVideoById(videoList[currentVideoIndex].id.videoId);
-        }
-
-        // YouTube API callback
-        window.onYouTubeIframeAPIReady = function() {
-            player = new YT.Player('youtube-player', {
-                height: '100%',
-                width: '100%',
-                playerVars: {
-                    'autoplay': 0,
-                    'controls': 1,
-                    'rel': 0,
-                    'fs': 1
-                },
-                events: {
-                    'onReady': onPlayerReady,
-                    'onStateChange': onPlayerStateChange,
-                    'onError': onPlayerError
-                }
-            });
-        };
-
-        // Player ready event
-        function onPlayerReady(event) {
-            console.log('Player ready');
-        }
-
-        // Player state change event
-        function onPlayerStateChange(event) {
-            // YT.PlayerState.PLAYING = 1
-            if (event.data === 1) {
-                isPlaying = true;
-                animateVisualizer(true);
-                
-                // Show video title notification
-                if (videoList.length > 0 && currentVideoIndex < videoList.length) {
-                    const videoTitle = videoList[currentVideoIndex].snippet.title;
-                    showVideoTitleNotification(videoTitle);
-                }
-            } 
-            // YT.PlayerState.PAUSED = 2, YT.PlayerState.ENDED = 0
-            else if (event.data === 2 || event.data === 0) {
-                isPlaying = event.data === 2; // Still playing if paused, not if ended
-                
-                if (event.data === 0) {
-                    // Video ended, play next
-                    playNextVideo();
-                } else {
-                    // Paused
-                    animateVisualizer(false);
-                }
-            }
-        }
-
-        // Player error event
-        function onPlayerError(event) {
-            console.error('Player error:', event);
-            
-            // Display error notification
-            const errorMessage = "재생할 수 없는 영상입니다. 다음 영상으로 이동합니다...";
-            const notification = document.getElementById('video-title-notification');
-            notification.textContent = errorMessage;
-            notification.classList.add('show');
-            
-            // Auto skip to next video on error
-            setTimeout(() => {
-                playNextVideo();
-            }, 1500);
-        }
-
+        // WebSocket 연결
+        const wsProtocol = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+        const wsUrl = wsProtocol + window.location.host + '/ws';
+        let socket = new WebSocket(wsUrl);
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+        const reconnectDelay = 3000; // 3초
+        
+        // Global variables
+        let currentServer = null;
+        let userName = '';
+        let currentServerId = null;
+        let joinedRooms = new Set();
+        
         // Initialize the app
-        document.addEventListener('DOMContentLoaded', function() {
-            // Initialize animations
-            initAnimationBg();
-            initVisualizer();
+        function initApp() {
+            updateConnectionStatus();
             
-            // Intro page transition
+            // Check if user has a name
+            if (!userName) {
+                showModal('setNameModal');
+                return;
+            }
+            
+            showWelcomeScreen();
+        }
+        
+        // WebSocket 이벤트 핸들러
+        socket.onopen = function() {
+            console.log('WebSocket connected');
+            reconnectAttempts = 0;
+            updateConnectionStatus();
+            
+            // 이름이 설정되어 있다면 서버에 알림
+            if (userName) {
+                socket.send(JSON.stringify({
+                    type: 'set_username',
+                    username: userName
+                }));
+            }
+        };
+        
+        socket.onclose = function() {
+            console.log('WebSocket disconnected');
+            updateConnectionStatus();
+            attemptReconnect();
+        };
+        
+        socket.onerror = function(error) {
+            console.error('WebSocket error:', error);
+            updateConnectionStatus();
+        };
+        
+        socket.onmessage = function(event) {
+            const message = JSON.parse(event.data);
+            handleServerMessage(message);
+        };
+        
+        function handleServerMessage(message) {
+            switch (message.type) {
+                case 'room_created':
+                    handleRoomCreated(message);
+                    break;
+                    
+                case 'room_joined':
+                    handleRoomJoined(message);
+                    break;
+                    
+                case 'chat_message':
+                    addMessageToChat(message);
+                    break;
+                    
+                case 'system_message':
+                    addSystemMessageToChat(message);
+                    break;
+                    
+                case 'room_updated':
+                    handleRoomUpdated(message);
+                    break;
+                    
+                case 'room_deleted':
+                    handleRoomDeleted(message);
+                    break;
+                    
+                case 'error':
+                    alert(message.message);
+                    break;
+            }
+        }
+        
+        function handleRoomCreated(message) {
+            // 서버 생성 성공 처리
+            document.getElementById('inviteCode').textContent = message.inviteCode;
+            document.getElementById('inviteCodeDisplay').style.display = 'block';
+            document.querySelector('#createServerModal .modal-confirm').style.display = 'none';
+            
+            // 방 정보 저장
+            currentServerId = message.roomId;
+            joinedRooms.add(message.roomId);
+            
+            // 메시지 표시
+            const chatMessagesElement = document.getElementById('chatMessages');
+            chatMessagesElement.innerHTML = '';
+            
+            message.messages.forEach(msg => {
+                addMessageToChat(msg);
+            });
+            
+            // UI 업데이트
+            document.getElementById('chatHeader').textContent = message.roomName;
+            
+            // 3초 후 모달 닫기
             setTimeout(() => {
-                const introLoadingText = document.getElementById('intro-loading-text');
-                introLoadingText.textContent = '메인화면으로 이동중...';
+                hideModal('createServerModal');
+                showMainApp();
+                addServerToList(message.roomId, message.roomName);
+            }, 3000);
+        }
+        
+        function handleRoomJoined(message) {
+            // 방 참여 성공 처리
+            currentServerId = message.roomId;
+            joinedRooms.add(message.roomId);
+            
+            // 메시지 표시
+            const chatMessagesElement = document.getElementById('chatMessages');
+            chatMessagesElement.innerHTML = '';
+            
+            message.messages.forEach(msg => {
+                if (msg.user === '시스템') {
+                    addSystemMessageToChat(msg);
+                } else {
+                    addMessageToChat(msg);
+                }
+            });
+            
+            // UI 업데이트
+            document.getElementById('chatHeader').textContent = message.roomName;
+            
+            hideModal('joinServerModal');
+            showMainApp();
+            addServerToList(message.roomId, message.roomName);
+        }
+        
+        function handleRoomUpdated(message) {
+            if (currentServerId === message.roomId) {
+                document.getElementById('chatHeader').textContent = message.roomName;
+            }
+            
+            // 서버 목록에서 이름 업데이트
+            const serverItems = document.querySelectorAll('.server-item');
+            serverItems.forEach(item => {
+                if (item.dataset.serverId === message.roomId) {
+                    item.firstChild.textContent = message.roomName;
+                }
+            });
+            
+            addSystemMessageToChat(message.systemMessage);
+            hideModal('editServerModal');
+        }
+        
+        function handleRoomDeleted(message) {
+            if (currentServerId === message.roomId) {
+                currentServerId = null;
+                
+                // 다른 방이 있으면 첫 번째 방으로 이동
+                if (joinedRooms.size > 0) {
+                    const firstRoomId = Array.from(joinedRooms)[0];
+                    joinServerById(firstRoomId);
+                } else {
+                    showWelcomeScreen();
+                }
+            }
+            
+            // 서버 목록에서 제거
+            const serverItem = document.querySelector(`.server-item[data-server-id="${message.roomId}"]`);
+            if (serverItem) {
+                serverItem.remove();
+            }
+            
+            joinedRooms.delete(message.roomId);
+            hideModal('editServerModal');
+        }
+        
+        function addMessageToChat(message) {
+            const chatMessagesElement = document.getElementById('chatMessages');
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            
+            const messageInfoElement = document.createElement('div');
+            messageInfoElement.className = 'message-info';
+            
+            const userElement = document.createElement('span');
+            userElement.className = 'message-user';
+            userElement.textContent = message.user;
+            
+            const timeElement = document.createElement('span');
+            timeElement.className = 'message-time';
+            timeElement.textContent = new Date(message.timestamp).toLocaleTimeString();
+            
+            const contentElement = document.createElement('div');
+            contentElement.className = 'message-content';
+            contentElement.textContent = message.content;
+            
+            messageInfoElement.appendChild(userElement);
+            messageInfoElement.appendChild(timeElement);
+            messageElement.appendChild(messageInfoElement);
+            messageElement.appendChild(contentElement);
+            chatMessagesElement.appendChild(messageElement);
+            
+            // 스크롤 아래로
+            chatMessagesElement.scrollTop = chatMessagesElement.scrollHeight;
+        }
+        
+        function addSystemMessageToChat(message) {
+            const chatMessagesElement = document.getElementById('chatMessages');
+            
+            const messageElement = document.createElement('div');
+            messageElement.className = 'message';
+            messageElement.style.color = '#43b581';
+            
+            const messageInfoElement = document.createElement('div');
+            messageInfoElement.className = 'message-info';
+            
+            const userElement = document.createElement('span');
+            userElement.className = 'message-user';
+            userElement.textContent = message.user;
+            
+            const timeElement = document.createElement('span');
+            timeElement.className = 'message-time';
+            timeElement.textContent = new Date(message.timestamp).toLocaleTimeString();
+            
+            const contentElement = document.createElement('div');
+            contentElement.className = 'message-content';
+            contentElement.textContent = message.content;
+            
+            messageInfoElement.appendChild(userElement);
+            messageInfoElement.appendChild(timeElement);
+            messageElement.appendChild(messageInfoElement);
+            messageElement.appendChild(contentElement);
+            chatMessagesElement.appendChild(messageElement);
+            
+            // 스크롤 아래로
+            chatMessagesElement.scrollTop = chatMessagesElement.scrollHeight;
+        }
+        
+        function updateConnectionStatus() {
+            const statusElement = document.getElementById('connectionStatus');
+            if (socket.readyState === WebSocket.OPEN) {
+                statusElement.textContent = '연결됨';
+                statusElement.classList.add('connected');
+                statusElement.classList.remove('disconnected');
+            } else {
+                statusElement.textContent = '연결 끊김';
+                statusElement.classList.add('disconnected');
+                statusElement.classList.remove('connected');
+            }
+        }
+        
+        function attemptReconnect() {
+            if (reconnectAttempts < maxReconnectAttempts) {
+                reconnectAttempts++;
+                console.log(`재연결 시도 ${reconnectAttempts}/${maxReconnectAttempts}...`);
                 
                 setTimeout(() => {
-                    showPage('main-page');
-                }, 1000);
-            }, 4000);
+                    socket = new WebSocket(wsUrl);
+                    socket.onopen = function() {
+                        console.log('재연결 성공');
+                        reconnectAttempts = 0;
+                        updateConnectionStatus();
+                        
+                        // 이름 재설정
+                        if (userName) {
+                            socket.send(JSON.stringify({
+                                type: 'set_username',
+                                username: userName
+                            }));
+                        }
+                        
+                        // 현재 방 재참여
+                        if (currentServerId) {
+                            socket.send(JSON.stringify({
+                                type: 'join_room',
+                                roomId: currentServerId,
+                                username: userName
+                            }));
+                        }
+                    };
+                    
+                    // 기존 이벤트 핸들러 재설정
+                    socket.onclose = function() {
+                        console.log('WebSocket disconnected');
+                        updateConnectionStatus();
+                        attemptReconnect();
+                    };
+                    
+                    socket.onerror = function(error) {
+                        console.error('WebSocket error:', error);
+                        updateConnectionStatus();
+                    };
+                    
+                    socket.onmessage = function(event) {
+                        const message = JSON.parse(event.data);
+                        handleServerMessage(message);
+                    };
+                }, reconnectDelay);
+            } else {
+                console.log('최대 재연결 시도 횟수 도달');
+            }
+        }
+        
+        // Show welcome screen
+        function showWelcomeScreen() {
+            document.getElementById('welcomeScreen').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+        }
+        
+        // Show main app
+        function showMainApp() {
+            document.getElementById('welcomeScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'flex';
+        }
+        
+        // Show modal
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+        
+        // Hide modal
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+        
+        // Show create server modal
+        function showCreateServerModal() {
+            document.getElementById('inviteCodeDisplay').style.display = 'none';
+            document.getElementById('serverName').value = '';
+            document.querySelector('#createServerModal .modal-confirm').style.display = 'block';
+            showModal('createServerModal');
+        }
+        
+        // Show join server modal
+        function showJoinServerModal() {
+            document.getElementById('joinCode').value = '';
+            showModal('joinServerModal');
+        }
+        
+        // Create a new server
+        function createServer() {
+            const serverName = document.getElementById('serverName').value.trim();
+            const userNameInput = document.getElementById('userName').value.trim();
             
-            // Event Listeners
-            document.getElementById('search-btn').addEventListener('click', function() {
-                showPage('search-page');
-            });
+            if (!serverName) {
+                alert('서버 이름을 입력해주세요.');
+                return;
+            }
             
-            document.getElementById('search-back-btn').addEventListener('click', function() {
-                showPage('main-page');
-            });
+            if (!userNameInput) {
+                alert('사용자 이름을 입력해주세요.');
+                return;
+            }
             
-            document.getElementById('video-back-btn').addEventListener('click', function() {
-                player.stopVideo();
-                animateVisualizer(false);
-                showPage('search-page');
-            });
+            // Set user name
+            userName = userNameInput;
             
-            document.getElementById('find-btn').addEventListener('click', function() {
-                const query = document.getElementById('search-input').value.trim();
-                if (query) {
-                    searchVideos(query);
+            // WebSocket이 연결되어 있는지 확인
+            if (socket.readyState !== WebSocket.OPEN) {
+                alert('서버에 연결되지 않았습니다. 잠시 후 다시 시도해주세요.');
+                return;
+            }
+            
+            // 서버 생성 요청 전송
+            socket.send(JSON.stringify({
+                type: 'create_room',
+                roomName: serverName,
+                username: userName
+            }));
+        }
+        
+        // Join a server with invite code
+        function joinServer() {
+            const joinCode = document.getElementById('joinCode').value.trim();
+            const userNameInput = document.getElementById('joinUserName').value.trim();
+            
+            if (!joinCode || joinCode.length !== 4) {
+                alert('유효한 4자리 초대 코드를 입력해주세요.');
+                return;
+            }
+            
+            if (!userNameInput) {
+                alert('사용자 이름을 입력해주세요.');
+                return;
+            }
+            
+            // Set user name
+            userName = userNameInput;
+            
+            // WebSocket이 연결되어 있는지 확인
+            if (socket.readyState !== WebSocket.OPEN) {
+                alert('서버에 연결되지 않았습니다. 잠시 후 다시 시도해주세요.');
+                return;
+            }
+            
+            // 서버 참여 요청 전송
+            socket.send(JSON.stringify({
+                type: 'join_room',
+                roomId: joinCode,
+                username: userName
+            }));
+        }
+        
+        // Join server by ID
+        function joinServerById(serverId) {
+            if (socket.readyState !== WebSocket.OPEN) {
+                alert('서버에 연결되지 않았습니다. 잠시 후 다시 시도해주세요.');
+                return;
+            }
+            
+            socket.send(JSON.stringify({
+                type: 'join_room',
+                roomId: serverId,
+                username: userName
+            }));
+        }
+        
+        // Add server to sidebar list
+        function addServerToList(serverId, serverName) {
+            const serverListElement = document.getElementById('serverList');
+            
+            // 이미 추가되어 있는지 확인
+            if (document.querySelector(`.server-item[data-server-id="${serverId}"]`)) {
+                return;
+            }
+            
+            const serverElement = document.createElement('div');
+            serverElement.className = 'server-item';
+            serverElement.dataset.serverId = serverId;
+            serverElement.textContent = serverName;
+            serverElement.onclick = () => joinServerById(serverId);
+            
+            const controlsElement = document.createElement('div');
+            controlsElement.className = 'server-controls';
+            
+            const editButton = document.createElement('button');
+            editButton.innerHTML = '✏️';
+            editButton.onclick = (e) => {
+                e.stopPropagation();
+                showEditServerModal(serverId, serverName);
+            };
+            
+            const deleteButton = document.createElement('button');
+            deleteButton.innerHTML = '🗑️';
+            deleteButton.onclick = (e) => {
+                e.stopPropagation();
+                if (confirm('정말로 이 서버를 삭제하시겠습니까?')) {
+                    deleteServerById(serverId);
                 }
-            });
+            };
             
-            document.getElementById('search-input').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    const query = this.value.trim();
-                    if (query) {
-                        searchVideos(query);
-                    }
+            controlsElement.appendChild(editButton);
+            controlsElement.appendChild(deleteButton);
+            serverElement.appendChild(controlsElement);
+            serverListElement.appendChild(serverElement);
+        }
+        
+        // Show edit server modal
+        function showEditServerModal(serverId, serverName) {
+            document.getElementById('editServerName').value = serverName;
+            currentServerId = serverId;
+            showModal('editServerModal');
+        }
+        
+        // Update server
+        function updateServer() {
+            const newName = document.getElementById('editServerName').value.trim();
+            
+            if (!newName) {
+                alert('서버 이름을 입력해주세요.');
+                return;
+            }
+            
+            if (socket.readyState !== WebSocket.OPEN) {
+                alert('서버에 연결되지 않았습니다. 잠시 후 다시 시도해주세요.');
+                return;
+            }
+            
+            socket.send(JSON.stringify({
+                type: 'edit_room_name',
+                roomId: currentServerId,
+                newName: newName
+            }));
+        }
+        
+        // Delete server
+        function deleteServer() {
+            if (confirm('정말로 이 서버를 삭제하시겠습니까? 모든 채팅 기록이 사라집니다.')) {
+                if (socket.readyState !== WebSocket.OPEN) {
+                    alert('서버에 연결되지 않았습니다. 잠시 후 다시 시도해주세요.');
+                    return;
                 }
-            });
+                
+                socket.send(JSON.stringify({
+                    type: 'delete_room',
+                    roomId: currentServerId
+                }));
+            }
+        }
+        
+        // Delete server by ID
+        function deleteServerById(serverId) {
+            if (socket.readyState !== WebSocket.OPEN) {
+                alert('서버에 연결되지 않았습니다. 잠시 후 다시 시도해주세요.');
+                return;
+            }
             
-            document.getElementById('next-video-btn').addEventListener('click', function() {
-                playNextVideo();
-            });
+            socket.send(JSON.stringify({
+                type: 'delete_room',
+                roomId: serverId
+            }));
+        }
+        
+        // Send message
+        function sendMessage(event) {
+            event.preventDefault();
+            
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            if (!currentServerId) {
+                alert('서버에 참여해주세요.');
+                return;
+            }
+            
+            if (socket.readyState !== WebSocket.OPEN) {
+                alert('서버에 연결되지 않았습니다. 잠시 후 다시 시도해주세요.');
+                return;
+            }
+            
+            // 메시지 전송
+            socket.send(JSON.stringify({
+                type: 'chat_message',
+                roomId: currentServerId,
+                content: message
+            }));
+            
+            // 입력 필드 비우기
+            messageInput.value = '';
+        }
+        
+        // Set user name
+        function setUserName() {
+            const nameInput = document.getElementById('setUserName').value.trim();
+            
+            if (!nameInput) {
+                alert('이름을 입력해주세요.');
+                return;
+            }
+            
+            userName = nameInput;
+            hideModal('setNameModal');
+            
+            // WebSocket이 연결되어 있다면 이름 설정
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({
+                    type: 'set_username',
+                    username: userName
+                }));
+            }
+            
+            // 앱 초기화 계속 진행
+            initApp();
+        }
+        
+        // Initialize the app when loaded
+        window.onload = function() {
+            // Check if WiFi is connected
+            if (!navigator.onLine) {
+                alert('인터넷에 연결되어 있지 않습니다. 연결 후 다시 시도해주세요.');
+                return;
+            }
+            
+            initApp();
+        };
+        
+        // Handle Enter key in message input
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage(e);
+            }
         });
     </script>
 </body>
-</html>
+</html>`
